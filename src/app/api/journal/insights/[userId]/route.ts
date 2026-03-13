@@ -30,37 +30,54 @@ export async function GET(
 
     // 2. Top Emotion
     const emotions = entries
-      .map((e) => e.analysis?.emotion)
-      .filter((e): e is string => !!e);
+      .map((e: { analysis: { emotion: any } }) => e.analysis?.emotion)
+      .filter((e: any): e is string => !!e);
 
-    const emotionCounts = emotions.reduce((acc, curr) => {
-      acc[curr] = (acc[curr] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const emotionCounts = emotions.reduce(
+      (acc: { [x: string]: any }, curr: string | number) => {
+        acc[curr] = (acc[curr] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const topEmotion = Object.entries(emotionCounts).length > 0
-      ? Object.entries(emotionCounts).sort((a, b) => b[1] - a[1])[0][0]
-      : 'None';
+    const topEmotion =
+      Object.entries(emotionCounts).length > 0
+        ? Object.entries(emotionCounts).sort(
+            (a: any, b: any) => b[1] - a[1],
+          )[0][0]
+        : 'None';
 
     // 3. Most Used Ambience
-    const ambiences = entries.map((e) => e.ambience);
-    const ambienceCounts = ambiences.reduce((acc, curr) => {
-      acc[curr] = (acc[curr] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const ambiences = entries.map((e: { ambience: any }) => e.ambience);
+    const ambienceCounts = ambiences.reduce(
+      (acc: { [x: string]: any }, curr: string | number) => {
+        acc[curr] = (acc[curr] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const mostUsedAmbience = Object.entries(ambienceCounts).length > 0
-      ? Object.entries(ambienceCounts).sort((a, b) => b[1] - a[1])[0][0]
-      : 'None';
+    const mostUsedAmbience =
+      Object.entries(ambienceCounts).length > 0
+        ? Object.entries(ambienceCounts).sort(
+            (a: any, b: any) => b[1] - a[1],
+          )[0][0]
+        : 'None';
 
     // 4. Recent Keywords
     const recentKeywords = entries
-      .filter((e) => e.analysis && e.analysis.keywords)
+      .filter(
+        (e: { analysis: { keywords: any } }) =>
+          e.analysis && e.analysis.keywords,
+      )
       .slice(0, 5)
-      .flatMap((e) => e.analysis!.keywords.split(','))
-      .map(k => k.trim())
-      .filter((k) => k.length > 0)
-      .filter((v, i, a) => a.indexOf(v) === i)
+      .flatMap((e: { analysis: { keywords: any } }) =>
+        e.analysis!.keywords.split(','),
+      )
+      .map((k: string) => k.trim())
+      .filter((k: string) => k.length > 0)
+      .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i)
       .slice(0, 8);
 
     return NextResponse.json({

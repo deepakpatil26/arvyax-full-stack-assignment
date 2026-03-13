@@ -34,6 +34,11 @@ export default function JournalDashboard() {
   const [insights, setInsights] = useState<Insights | null>(null)
   const [loading, setLoading] = useState(false)
   const [analyzingId, setAnalyzingId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<Ambience | 'all'>('all')
+
+  const filteredEntries = filter === 'all' 
+    ? entries 
+    : entries.filter(e => e.ambience === filter)
 
   useEffect(() => {
     fetchEntries()
@@ -102,6 +107,29 @@ export default function JournalDashboard() {
     } finally {
       setAnalyzingId(null)
     }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this session?')) return
+    try {
+      const res = await fetch(`/api/journal/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        await fetchEntries()
+        await fetchInsights()
+      }
+    } catch (err) {
+      console.error('Failed to delete entry', err)
+    }
+  }
+
+  const getMoodColor = (emotion?: string) => {
+    if (!emotion) return 'rgba(255,255,255,0.1)'
+    const e = emotion.toLowerCase()
+    if (e.includes('joy') || e.includes('happy') || e.includes('cheerful')) return 'rgba(234, 179, 8, 0.2)'
+    if (e.includes('calm') || e.includes('peace') || e.includes('relax')) return 'rgba(16, 185, 129, 0.2)'
+    if (e.includes('anxious') || e.includes('stress')) return 'rgba(239, 68, 68, 0.2)'
+    if (e.includes('sad') || e.includes('lonely')) return 'rgba(59, 130, 246, 0.2)'
+    return 'rgba(6, 182, 212, 0.2)'
   }
 
   const getAmbienceIcon = (a: Ambience) => {
@@ -219,9 +247,33 @@ export default function JournalDashboard() {
 
       {/* Feed Section */}
       <section style={{ paddingBottom: '10rem' }}>
-        <h2 className="sessions-title">Past Sessions</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <h2 className="sessions-title" style={{ margin: 0 }}>Past Sessions</h2>
+          <div className="ambience-selector" style={{ background: 'var(--surface)', padding: '0.4rem', borderRadius: '999px' }}>
+            {(['all', 'forest', 'ocean', 'mountain'] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                style={{
+                  background: filter === f ? 'var(--primary)' : 'transparent',
+                  color: filter === f ? '#000' : 'var(--text-muted)',
+                  border: 'none',
+                  padding: '0.4rem 1rem',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+        
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {entries.map((entry, idx) => (
+          {filteredEntries.map((entry, idx) => (
             <motion.div 
               layout
               key={entry.id}
@@ -230,12 +282,22 @@ export default function JournalDashboard() {
               transition={{ delay: 0.1 * idx }}
               className="glass-card session-card"
             >
-              <div className="session-header">
-                <span className="session-meta-pill">
-                  {getAmbienceIcon(entry.ambience)}
-                  {entry.ambience}
-                </span>
-                <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
+              <div className="session-header" style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span className="session-meta-pill">
+                    {getAmbienceIcon(entry.ambience)}
+                    {entry.ambience}
+                  </span>
+                  <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
+                </div>
+                <button 
+                  onClick={() => handleDelete(entry.id)}
+                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', opacity: 0.4, transition: 'opacity 0.2s' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.4')}
+                >
+                  Delete
+                </button>
               </div>
               <p className="session-text">{entry.text}</p>
               
@@ -245,7 +307,9 @@ export default function JournalDashboard() {
                   animate={{ opacity: 1 }}
                   className="analysis-container"
                 >
-                  <span className="emotion-tag">Emotion: {entry.analysis.emotion}</span>
+                  <span className="emotion-tag" style={{ background: getMoodColor(entry.analysis.emotion), color: '#fff' }}>
+                    Emotion: {entry.analysis.emotion}
+                  </span>
                   <p className="analysis-summary">"{entry.analysis.summary}"</p>
                 </motion.div>
               ) : (

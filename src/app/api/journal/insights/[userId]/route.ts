@@ -10,6 +10,7 @@ export async function GET(
   try {
     const entries = await prisma.journalEntry.findMany({
       where: { userId },
+      orderBy: { createdAt: 'desc' },
       include: {
         analysis: true,
       },
@@ -30,35 +31,36 @@ export async function GET(
     // 2. Top Emotion
     const emotions = entries
       .map((e) => e.analysis?.emotion)
-      .filter(Boolean) as string[];
+      .filter((e): e is string => !!e);
 
-    const topEmotion =
-      emotions.length > 0
-        ? emotions
-            .sort(
-              (a, b) =>
-                emotions.filter((v) => v === a).length -
-                emotions.filter((v) => v === b).length,
-            )
-            .pop()
-        : 'None';
+    const emotionCounts = emotions.reduce((acc, curr) => {
+      acc[curr] = (acc[curr] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topEmotion = Object.entries(emotionCounts).length > 0
+      ? Object.entries(emotionCounts).sort((a, b) => b[1] - a[1])[0][0]
+      : 'None';
 
     // 3. Most Used Ambience
     const ambiences = entries.map((e) => e.ambience);
-    const mostUsedAmbience = ambiences
-      .sort(
-        (a, b) =>
-          ambiences.filter((v) => v === a).length -
-          ambiences.filter((v) => v === b).length,
-      )
-      .pop();
+    const ambienceCounts = ambiences.reduce((acc, curr) => {
+      acc[curr] = (acc[curr] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const mostUsedAmbience = Object.entries(ambienceCounts).length > 0
+      ? Object.entries(ambienceCounts).sort((a, b) => b[1] - a[1])[0][0]
+      : 'None';
 
     // 4. Recent Keywords
     const recentKeywords = entries
-      .filter((e) => e.analysis)
-      .slice(0, 5) // Last 5 entries
+      .filter((e) => e.analysis && e.analysis.keywords)
+      .slice(0, 5)
       .flatMap((e) => e.analysis!.keywords.split(','))
-      .filter((v, i, a) => a.indexOf(v) === i) // Unique
+      .map(k => k.trim())
+      .filter((k) => k.length > 0)
+      .filter((v, i, a) => a.indexOf(v) === i)
       .slice(0, 8);
 
     return NextResponse.json({

@@ -10,7 +10,7 @@ This document outlines the design decisions, scalability strategy, and technical
 
 ## 1. Scalability Strategy
 To support 100,000+ users:
-- **Database**: Migrate from SQLite to a managed **PostgreSQL** (e.g., Supabase or AWS RDS) with connection pooling (Prisma Accelerate).
+- **Database**: PostgreSQL (Production-ready) with Prisma ORM. Local development can still be bridged via SQLite if needed, but production is strictly PostgreSQL.
 - **API Layer**: Deploy on **Vercel** or **AWS Lambda**. Next.js API routes scale horizontally by default.
 - **Caching Layer**: Use **Redis** via Upstash to cache LLM responses across different users for similar inputs (e.g., common phrases).
 - **Background Tasks**: Offload heavy AI processing to background workers (e.g., Inngest or BullMQ) to keep the UI responsive.

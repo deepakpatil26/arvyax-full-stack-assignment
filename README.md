@@ -24,6 +24,7 @@ ArvyaX Journal is a high-fidelity, full-stack journaling system designed for use
 ## 📸 Screenshots
 
 ### AI Insight & Analysis
+
 The system identifies deep emotional patterns and provides empathetic summaries based on your reflections.
 
 ![ArvyaX Analysis](public/screenshots/dashboard_analysis.png)
@@ -31,18 +32,21 @@ The system identifies deep emotional patterns and provides empathetic summaries 
 ## 🛠️ Getting Started
 
 1. **Install Dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Environment Variables**:
    Create a `.env` file and add your Groq API Key:
+
    ```env
    DATABASE_URL="file:./dev.db"
    GROQ_API_KEY="your_api_key_here"
    ```
 
 3. **Initialize Database**:
+
    ```bash
    npx prisma db push
    ```
@@ -58,4 +62,5 @@ The system identifies deep emotional patterns and provides empathetic summaries 
 For a deep dive into how this system scales to 100,000+ users, handles security, and optimizes AI costs, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
-*Built with ❤️ for the ArvyaX Nature Immersive Experience.*
+
+_Built with ❤️ for the ArvyaX Nature Immersive Experience._

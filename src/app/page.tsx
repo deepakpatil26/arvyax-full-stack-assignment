@@ -36,8 +36,8 @@ export default function JournalDashboard() {
   const [analyzingId, setAnalyzingId] = useState<string | null>(null)
   const [filter, setFilter] = useState<Ambience | 'all'>('all')
 
-  const filteredEntries = filter === 'all' 
-    ? entries 
+  const filteredEntries = filter === 'all'
+    ? entries
     : entries.filter(e => e.ambience === filter)
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function JournalDashboard() {
 
   const fetchEntries = async () => {
     try {
-      const res = await fetch(`/api/journal?userId=${userId}`)
+      const res = await fetch(`/api/journal/${userId}`)
       const data = await res.json()
       setEntries(data)
     } catch (err) {
@@ -112,7 +112,7 @@ export default function JournalDashboard() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this session?')) return
     try {
-      const res = await fetch(`/api/journal/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/journal/entry/${id}`, { method: 'DELETE' })
       if (res.ok) {
         await fetchEntries()
         await fetchInsights()
@@ -145,7 +145,7 @@ export default function JournalDashboard() {
       {/* Header & Insights */}
       <header className="header">
         <div className="title-group">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
@@ -176,7 +176,7 @@ export default function JournalDashboard() {
 
       {insights && (
         <section className="insights-grid">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -188,7 +188,7 @@ export default function JournalDashboard() {
               <span style={{ textTransform: 'capitalize' }}>{insights.mostUsedAmbience}</span>
             </div>
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -207,7 +207,7 @@ export default function JournalDashboard() {
 
       {/* Input Section */}
       <section className="input-section">
-        <motion.form 
+        <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -271,10 +271,10 @@ export default function JournalDashboard() {
             ))}
           </div>
         </div>
-        
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {filteredEntries.map((entry, idx) => (
-            <motion.div 
+            <motion.div
               layout
               key={entry.id}
               initial={{ opacity: 0, y: 20 }}
@@ -290,7 +290,7 @@ export default function JournalDashboard() {
                   </span>
                   <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => handleDelete(entry.id)}
                   style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', opacity: 0.4, transition: 'opacity 0.2s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
@@ -300,9 +300,9 @@ export default function JournalDashboard() {
                 </button>
               </div>
               <p className="session-text">{entry.text}</p>
-              
+
               {entry.analysis ? (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="analysis-container"

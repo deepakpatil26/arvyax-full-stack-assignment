@@ -2,7 +2,7 @@
 
 ArvyaX Journal is a high-fidelity, full-stack journaling system designed for users to reflect on their immersive nature sessions (Forest, Ocean, Mountain). Powered by AI, the system provides emotional insights, keyword extraction, and a premium, nature-themed dashboard.
 
-![ArvyaX Dashboard Main](public/screenshots/dashboard_main.png)
+![ArvyaX Dashboard Main](public/arvyax-dashboard.png)
 
 ## 🌐 Live Demo
 [View Live Application](https://arvyax-full-stack-assignment.vercel.app/)

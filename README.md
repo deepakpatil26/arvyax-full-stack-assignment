@@ -29,7 +29,7 @@ ArvyaX Journal is a high-fidelity, full-stack journaling system designed for use
 ### AI Insight & Analysis
 The system identifies deep emotional patterns and provides empathetic summaries based on your reflections.
 
-![ArvyaX Analysis](public/screenshots/dashboard_analysis.png)
+![ArvyaX Analysis](public/arvyax-analysis.png)
 
 ## 🛠️ Getting Started
 
